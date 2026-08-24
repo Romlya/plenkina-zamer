@@ -6,57 +6,80 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0A0A0C">
 <title>ПЛЕНКИН · Замер</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/app.css">
+<style>
+:root{--bg:#0A0A0C;--bg2:#12121A;--card:#1A1A24;--gold:#F0C14B;--text:#F5F5F7;--muted:#9CA3AF;--line:#2A2A36;--danger:#E85D5D;--radius:12px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}body{padding-top:var(--safe-t);padding-bottom:var(--safe-b);max-width:720px;margin:0 auto}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:var(--bg)}
+.logo{font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--gold)}.logo-sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.btn-icon{background:var(--card);border:1px solid var(--line);color:var(--text);width:40px;height:40px;border-radius:10px;font-size:18px}
+.screen{min-height:calc(100vh - 70px);padding-bottom:100px}.page-pad{padding:16px}.page-title{font-size:22px;font-weight:800;margin-bottom:6px}.page-hint{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.4}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;font-size:15px;font-weight:600;font-family:inherit;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;width:auto}
+.btn-primary{background:var(--gold);border-color:var(--gold);color:#0A0A0C}.btn-ghost{background:transparent;color:var(--muted)}.btn-block{width:100%;margin-bottom:10px}.btn-sm{padding:8px 12px;font-size:13px}.btn-danger{border-color:var(--danger);color:var(--danger);background:transparent;padding:8px 10px;font-size:12px}
+.objects-list{margin-top:16px;display:flex;flex-direction:column;gap:10px}.obj-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;text-align:left;width:100%;color:inherit;font-family:inherit}.obj-card h3{font-size:15px;font-weight:700;margin-bottom:4px}.obj-meta{font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}.obj-area{color:var(--gold);font-weight:700}.empty{text-align:center;color:var(--muted);font-size:14px;margin-top:40px;line-height:1.5}
+.form-section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}.section-title{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.section-head .section-title{margin:0}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field span{font-size:12px;color:var(--muted);font-weight:600}.field input,.field select,.field textarea{background:var(--bg2);border:1.5px solid var(--line);border-radius:8px;padding:11px 12px;font-size:16px;font-family:inherit;color:var(--text);outline:none;width:100%}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.win-card{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}.win-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.win-num{font-size:12px;font-weight:700;color:var(--gold)}.win-grid{display:grid;grid-template-columns:1fr 1fr .7fr;gap:8px}.win-grid .field{margin-bottom:0}.win-note{margin-top:8px}.win-area{margin-top:8px;font-size:13px;color:var(--muted)}.win-area strong{color:var(--gold)}
+.total-bar{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:14px}.total-bar strong{font-size:20px;color:var(--gold)}
+.actions-sticky{position:fixed;bottom:0;left:0;right:0;max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:10px;padding:12px 16px calc(12px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%);z-index:15}
+.export-preview{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:11px;line-height:1.45;color:var(--muted);white-space:pre-wrap;max-height:280px;overflow:auto}
+.toast{position:fixed;left:50%;bottom:calc(80px + var(--safe-b));transform:translateX(-50%);background:var(--gold);color:#0A0A0C;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:700;z-index:50;white-space:nowrap}
+</style>
 </head>
 <body>
-<header class="header">
-<div class="header-brand"><span class="logo">ПЛЕНКИН</span><span class="logo-sub">Замер остекления</span></div>
-<button type="button" class="btn-icon" id="btnHome" hidden>☰</button>
-</header>
-<main id="screenList" class="screen"><div class="page-pad">
-<h1 class="page-title">Объекты</h1>
-<p class="page-hint">Создайте замер на объекте. Данные сохраняются на устройстве.</p>
-<button type="button" class="btn btn-primary btn-block" id="btnNew">+ Новый замер</button>
-<div id="objectsList" class="objects-list"></div>
-<p id="emptyState" class="empty">Пока нет замеров.<br>Нажмите «Новый замер».</p>
-</div></main>
-<main id="screenForm" class="screen" hidden><div class="page-pad">
-<div class="form-section">
-<h2 class="section-title">Объект</h2>
-<label class="field"><span>Адрес / название *</span><input type="text" id="fAddress" placeholder="ул. …, ЖК / БЦ / школа"></label>
-<div class="row-2">
-<label class="field"><span>Клиент / контакт</span><input type="text" id="fClient"></label>
-<label class="field"><span>Телефон</span><input type="tel" id="fPhone" inputmode="tel"></label>
-</div>
-<div class="row-2">
-<label class="field"><span>Дата</span><input type="date" id="fDate"></label>
-<label class="field"><span>Замерщик</span><input type="text" id="fSurveyor"></label>
-</div>
-<label class="field"><span>Тип плёнки</span><select id="fFilm"><option value="">— не выбран —</option><option value="athermal">Атермальная / солнцезащита</option><option value="k4">К4</option><option value="r1a">Р1А</option><option value="r2a">Р2А</option><option value="r3a">Р3А</option><option value="r4a">Р4А</option><option value="matte">Матирование / декор</option><option value="print">Фотопечать</option><option value="smart">Смарт</option><option value="other">Другое</option></select></label>
-<label class="field"><span>Комментарий</span><textarea id="fNotes" rows="2"></textarea></label>
-</div>
-<div class="form-section">
-<div class="section-head"><h2 class="section-title">Окна / стёкла</h2><button type="button" class="btn btn-sm" id="btnAddWin">+ Добавить</button></div>
-<div id="windowsList"></div>
-<div class="total-bar"><span>Итого площадь</span><strong id="totalArea">0,00 м²</strong></div>
-</div>
-<div class="actions-sticky">
-<button type="button" class="btn btn-ghost" id="btnSave">Сохранить</button>
-<button type="button" class="btn btn-primary" id="btnExport">Выгрузить</button>
-</div>
-</div></main>
-<main id="screenExport" class="screen" hidden><div class="page-pad">
-<h1 class="page-title">Выгрузка</h1>
-<p class="page-hint" id="exportSummary"></p>
-<button type="button" class="btn btn-primary btn-block" id="btnShare">Поделиться / отправить</button>
-<button type="button" class="btn btn-block" id="btnCopy">Скопировать текст</button>
-<button type="button" class="btn btn-block" id="btnCsv">Скачать CSV (Excel)</button>
-<button type="button" class="btn btn-block" id="btnJson">Скачать JSON</button>
-<button type="button" class="btn btn-ghost btn-block" id="btnBackForm">← К замеру</button>
-<pre id="exportPreview" class="export-preview"></pre>
-</div></main>
+<header class="header"><div class="header-brand"><span class="logo">ПЛЕНКИН</span><span class="logo-sub">Замер остекления</span></div><button type="button" class="btn-icon" id="btnHome" hidden>☰</button></header>
+<main id="screenList" class="screen"><div class="page-pad"><h1 class="page-title">Объекты</h1><p class="page-hint">Создайте замер на объекте. Данные сохраняются на устройстве.</p><button type="button" class="btn btn-primary btn-block" id="btnNew">+ Новый замер</button><div id="objectsList" class="objects-list"></div><p id="emptyState" class="empty">Пока нет замеров.<br>Нажмите «Новый замер».</p></div></main>
+<main id="screenForm" class="screen" hidden><div class="page-pad"><div class="form-section"><h2 class="section-title">Объект</h2><label class="field"><span>Адрес / название *</span><input type="text" id="fAddress" placeholder="ул. …, ЖК / БЦ / школа"></label><div class="row-2"><label class="field"><span>Клиент</span><input type="text" id="fClient"></label><label class="field"><span>Телефон</span><input type="tel" id="fPhone" inputmode="tel"></label></div><div class="row-2"><label class="field"><span>Дата</span><input type="date" id="fDate"></label><label class="field"><span>Замерщик</span><input type="text" id="fSurveyor"></label></div><label class="field"><span>Тип плёнки</span><select id="fFilm"><option value="">— не выбран —</option><option value="athermal">Атермальная / солнцезащита</option><option value="k4">К4</option><option value="r1a">Р1А</option><option value="r2a">Р2А</option><option value="r3a">Р3А</option><option value="r4a">Р4А</option><option value="matte">Матирование / декор</option><option value="print">Фотопечать</option><option value="smart">Смарт</option><option value="other">Другое</option></select></label><label class="field"><span>Комментарий</span><textarea id="fNotes" rows="2"></textarea></label></div><div class="form-section"><div class="section-head"><h2 class="section-title">Окна / стёкла</h2><button type="button" class="btn btn-sm" id="btnAddWin">+ Добавить</button></div><div id="windowsList"></div><div class="total-bar"><span>Итого площадь</span><strong id="totalArea">0,00 м²</strong></div></div><div class="actions-sticky"><button type="button" class="btn btn-ghost" id="btnSave">Сохранить</button><button type="button" class="btn btn-primary" id="btnExport">Выгрузить</button></div></div></main>
+<main id="screenExport" class="screen" hidden><div class="page-pad"><h1 class="page-title">Выгрузка</h1><p class="page-hint" id="exportSummary"></p><button type="button" class="btn btn-primary btn-block" id="btnShare">Поделиться / отправить</button><button type="button" class="btn btn-block" id="btnCopy">Скопировать текст</button><button type="button" class="btn btn-block" id="btnCsv">Скачать CSV (Excel)</button><button type="button" class="btn btn-block" id="btnJson">Скачать JSON</button><button type="button" class="btn btn-ghost btn-block" id="btnBackForm">← К замеру</button><pre id="exportPreview" class="export-preview"></pre></div></main>
 <div id="toast" class="toast" hidden></div>
-<script src="js/app.js"></script>
+<script>
+(function(){
+var STORAGE_KEY="plenkina_zamer_v1",SURVEYOR_KEY="plenkina_surveyor";
+function $(id){return document.getElementById(id)}
+var state={objects:loadAll(),currentId:null};
+function loadAll(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return[]}}
+function saveAll(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state.objects))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function today(){return new Date().toISOString().slice(0,10)}
+function fmtArea(m2){return m2.toFixed(2).replace(".",",")+" м²"}
+function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(t._timer);t._timer=setTimeout(function(){t.hidden=true},2200)}
+function filmLabel(v){var map={athermal:"Атермальная / солнцезащита",k4:"К4",r1a:"Р1А",r2a:"Р2А",r3a:"Р3А",r4a:"Р4А",matte:"Матирование / декор",print:"Фотопечать",smart:"Смарт",other:"Другое"};return map[v]||"—"}
+function show(screen){$("screenList").hidden=screen!=="list";$("screenForm").hidden=screen!=="form";$("screenExport").hidden=screen!=="export";$("btnHome").hidden=screen==="list"}
+function escapeHtml(s){return String(s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/\"/g,""")}
+function calcTotal(obj){if(!obj||!obj.windows)return 0;return obj.windows.reduce(function(s,w){return s+winAreaM2(w.w,w.h,w.qty)},0)}
+function winAreaM2(w,h,q){return ((parseFloat(w)||0)/1000)*((parseFloat(h)||0)/1000)*(parseFloat(q)||1)}
+function renderList(){var list=$("objectsList"),empty=$("emptyState");list.innerHTML="";var items=state.objects.slice().sort(function(a,b){return(b.updated||b.created)-(a.updated||a.created)});empty.hidden=items.length>0;items.forEach(function(obj){var btn=document.createElement("button");btn.type="button";btn.className="obj-card";btn.innerHTML="<h3>"+escapeHtml(obj.address||"Без адреса")+"</h3><div class=\"obj-meta\"><span>"+(obj.date||"—")+"</span><span>"+(obj.windows&&obj.windows.length||0)+" поз.</span><span class=\"obj-area\">"+fmtArea(calcTotal(obj))+"</span></div>";btn.onclick=function(){openObject(obj.id)};list.appendChild(btn)})}
+function blankWindow(){return{id:uid(),w:"",h:"",qty:"1",note:""}}
+function blankObject(){return{id:uid(),address:"",client:"",phone:"",date:today(),surveyor:localStorage.getItem(SURVEYOR_KEY)||"",film:"",notes:"",windows:[blankWindow()],created:Date.now(),updated:Date.now()}}
+function openObject(id){state.currentId=id;var obj=state.objects.find(function(o){return o.id===id});if(!obj)return;fillForm(obj);show("form")}
+function newObject(){var obj=blankObject();state.objects.unshift(obj);state.currentId=obj.id;saveAll();fillForm(obj);show("form")}
+function fillForm(obj){$("fAddress").value=obj.address||"";$("fClient").value=obj.client||"";$("fPhone").value=obj.phone||"";$("fDate").value=obj.date||today();$("fSurveyor").value=obj.surveyor||"";$("fFilm").value=obj.film||"";$("fNotes").value=obj.notes||"";renderWindows(obj.windows||[]);updateTotal()}
+function collectWindows(){var list=[];document.querySelectorAll(".win-card").forEach(function(card){list.push({id:card.dataset.id,w:card.querySelector('[data-f="w"]').value,h:card.querySelector('[data-f="h"]').value,qty:card.querySelector('[data-f="qty"]').value||"1",note:card.querySelector('[data-f="note"]').value.trim()})});return list}
+function readForm(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return null;obj.address=$("fAddress").value.trim();obj.client=$("fClient").value.trim();obj.phone=$("fPhone").value.trim();obj.date=$("fDate").value;obj.surveyor=$("fSurveyor").value.trim();obj.film=$("fFilm").value;obj.notes=$("fNotes").value.trim();obj.windows=collectWindows();obj.updated=Date.now();if(obj.surveyor)localStorage.setItem(SURVEYOR_KEY,obj.surveyor);return obj}
+function updateWinArea(card){var a=winAreaM2(card.querySelector('[data-f="w"]').value,card.querySelector('[data-f="h"]').value,card.querySelector('[data-f="qty"]').value);card.querySelector("[data-area]").textContent=fmtArea(a)}
+function updateTotal(){var total=collectWindows().reduce(function(s,w){return s+winAreaM2(w.w,w.h,w.qty)},0);$("totalArea").textContent=fmtArea(total)}
+function renumberWindows(){document.querySelectorAll(".win-card").forEach(function(c,i){c.querySelector(".win-num").textContent="№ "+(i+1)})}
+function bindWinCard(card){card.querySelector("[data-del]").onclick=function(){card.remove();renumberWindows();updateTotal()};card.querySelectorAll("input").forEach(function(inp){inp.addEventListener("input",function(){updateWinArea(card);updateTotal()})});updateWinArea(card)}
+function renderWindows(windows){var wrap=$("windowsList");wrap.innerHTML="";windows.forEach(function(win,i){var card=document.createElement("div");card.className="win-card";card.dataset.id=win.id;card.innerHTML='<div class="win-card-head"><span class="win-num">№ '+(i+1)+'</span><button type="button" class="btn btn-danger" data-del>Удалить</button></div><div class="win-grid"><label class="field"><span>Ширина, мм</span><input type="number" inputmode="numeric" data-f="w" value="'+(win.w||"")+'" placeholder="1200" min="0"></label><label class="field"><span>Высота, мм</span><input type="number" inputmode="numeric" data-f="h" value="'+(win.h||"")+'" placeholder="1400" min="0"></label><label class="field"><span>Кол-во</span><input type="number" inputmode="numeric" data-f="qty" value="'+(win.qty||1)+'" min="1"></label></div><div class="win-note"><input type="text" data-f="note" value="'+escapeHtml(win.note||"")+'" placeholder="Этаж, помещение"></div><div class="win-area">Площадь: <strong data-area>0,00 м²</strong></div>';wrap.appendChild(card);bindWinCard(card)})}
+function addWindow(){var wrap=$("windowsList");var i=wrap.querySelectorAll(".win-card").length;var card=document.createElement("div");card.className="win-card";card.dataset.id=uid();card.innerHTML='<div class="win-card-head"><span class="win-num">№ '+(i+1)+'</span><button type="button" class="btn btn-danger" data-del>Удалить</button></div><div class="win-grid"><label class="field"><span>Ширина, мм</span><input type="number" inputmode="numeric" data-f="w" placeholder="1200" min="0"></label><label class="field"><span>Высота, мм</span><input type="number" inputmode="numeric" data-f="h" placeholder="1400" min="0"></label><label class="field"><span>Кол-во</span><input type="number" inputmode="numeric" data-f="qty" value="1" min="1"></label></div><div class="win-note"><input type="text" data-f="note" placeholder="Этаж, помещение"></div><div class="win-area">Площадь: <strong data-area>0,00 м²</strong></div>';wrap.appendChild(card);bindWinCard(card);card.querySelector('[data-f="w"]').focus()}
+function saveCurrent(){var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес объекта");$("fAddress").focus();return}saveAll();toast("Сохранено")}
+function buildText(obj){var area=calcTotal(obj),t="ПЛЕНКИН — ЗАМЕР ОСТЕКЛЕНИЯ\n────────────────────────\nАдрес: "+obj.address+"\n";if(obj.client)t+="Клиент: "+obj.client+"\n";if(obj.phone)t+="Телефон: "+obj.phone+"\n";t+="Дата: "+(obj.date||"—")+"\n";if(obj.surveyor)t+="Замерщик: "+obj.surveyor+"\n";t+="Плёнка: "+filmLabel(obj.film)+"\n";if(obj.notes)t+="Комментарий: "+obj.notes+"\n";t+="────────────────────────\nПозиции:\n";(obj.windows||[]).forEach(function(w,i){t+=(i+1)+". "+(w.w||"?")+"×"+(w.h||"?")+" мм × "+(w.qty||1)+" шт = "+fmtArea(winAreaM2(w.w,w.h,w.qty));if(w.note)t+=" ("+w.note+")";t+="\n"});t+="────────────────────────\nИТОГО: "+fmtArea(area)+"\n\nwww.plenkinaokna.ru · +7 985 780 13 75\n";return t}
+function buildCsv(obj){var rows=[["Адрес","Клиент","Телефон","Дата","Замерщик","Плёнка","№","Ширина мм","Высота мм","Кол-во","Площадь м2","Примечание","Комментарий"]];(obj.windows||[]).forEach(function(w,i){rows.push([obj.address,obj.client,obj.phone,obj.date,obj.surveyor,filmLabel(obj.film),i+1,w.w,w.h,w.qty||1,winAreaM2(w.w,w.h,w.qty).toFixed(3),w.note,obj.notes])});return rows.map(function(r){return r.map(function(c){return '"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(";")}).join("\n")}
+function openExport(){var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес");return}saveAll();$("exportSummary").textContent=obj.address+" · "+obj.windows.length+" поз. · "+fmtArea(calcTotal(obj));$("exportPreview").textContent=buildText(obj);show("export")}
+function download(name,content,mime){var blob=new Blob(["\ufeff"+content],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+function shareText(obj){var text=buildText(obj);if(navigator.share){navigator.share({title:"Замер ПЛЕНКИН",text:text}).catch(function(e){if(e.name!=="AbortError"){navigator.clipboard.writeText(text);toast("Скопировано")}});return}navigator.clipboard.writeText(text).then(function(){toast("Скопировано в буфер")})}
+$("btnNew").onclick=newObject;
+$("btnHome").onclick=function(){readForm();saveAll();renderList();show("list")};
+$("btnAddWin").onclick=addWindow;
+$("btnSave").onclick=saveCurrent;
+$("btnExport").onclick=openExport;
+$("btnBackForm").onclick=function(){show("form")};
+$("btnCopy").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;navigator.clipboard.writeText(buildText(obj)).then(function(){toast("Скопировано")})};
+$("btnShare").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(obj)shareText(obj)};
+$("btnCsv").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;var name=(obj.address||"zamer").replace(/[\\/:*?\"<>|]/g,"_").slice(0,40);download("zamer_"+name+".csv",buildCsv(obj),"text/csv;charset=utf-8");toast("CSV скачан")};
+$("btnJson").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;var name=(obj.address||"zamer").replace(/[\\/:*?\"<>|]/g,"_").slice(0,40);download("zamer_"+name+".json",JSON.stringify(obj,null,2),"application/json");toast("JSON скачан")};
+["fAddress","fClient","fPhone","fDate","fSurveyor","fFilm","fNotes"].forEach(function(id){$(id).addEventListener("change",function(){readForm();saveAll()})});
+renderList();show("list");
+})();
+</script>
 </body>
 </html>
