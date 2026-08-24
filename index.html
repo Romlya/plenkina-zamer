@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0A0A0C">
+<title>ПЛЕНКИН · Замер</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="header">
+<div class="header-brand"><span class="logo">ПЛЕНКИН</span><span class="logo-sub">Замер остекления</span></div>
+<button type="button" class="btn-icon" id="btnHome" hidden>☰</button>
+</header>
+<main id="screenList" class="screen"><div class="page-pad">
+<h1 class="page-title">Объекты</h1>
+<p class="page-hint">Создайте замер на объекте. Данные сохраняются на устройстве.</p>
+<button type="button" class="btn btn-primary btn-block" id="btnNew">+ Новый замер</button>
+<div id="objectsList" class="objects-list"></div>
+<p id="emptyState" class="empty">Пока нет замеров.<br>Нажмите «Новый замер».</p>
+</div></main>
+<main id="screenForm" class="screen" hidden><div class="page-pad">
+<div class="form-section">
+<h2 class="section-title">Объект</h2>
+<label class="field"><span>Адрес / название *</span><input type="text" id="fAddress" placeholder="ул. …, ЖК / БЦ / школа"></label>
+<div class="row-2">
+<label class="field"><span>Клиент / контакт</span><input type="text" id="fClient"></label>
+<label class="field"><span>Телефон</span><input type="tel" id="fPhone" inputmode="tel"></label>
+</div>
+<div class="row-2">
+<label class="field"><span>Дата</span><input type="date" id="fDate"></label>
+<label class="field"><span>Замерщик</span><input type="text" id="fSurveyor"></label>
+</div>
+<label class="field"><span>Тип плёнки</span><select id="fFilm"><option value="">— не выбран —</option><option value="athermal">Атермальная / солнцезащита</option><option value="k4">К4</option><option value="r1a">Р1А</option><option value="r2a">Р2А</option><option value="r3a">Р3А</option><option value="r4a">Р4А</option><option value="matte">Матирование / декор</option><option value="print">Фотопечать</option><option value="smart">Смарт</option><option value="other">Другое</option></select></label>
+<label class="field"><span>Комментарий</span><textarea id="fNotes" rows="2"></textarea></label>
+</div>
+<div class="form-section">
+<div class="section-head"><h2 class="section-title">Окна / стёкла</h2><button type="button" class="btn btn-sm" id="btnAddWin">+ Добавить</button></div>
+<div id="windowsList"></div>
+<div class="total-bar"><span>Итого площадь</span><strong id="totalArea">0,00 м²</strong></div>
+</div>
+<div class="actions-sticky">
+<button type="button" class="btn btn-ghost" id="btnSave">Сохранить</button>
+<button type="button" class="btn btn-primary" id="btnExport">Выгрузить</button>
+</div>
+</div></main>
+<main id="screenExport" class="screen" hidden><div class="page-pad">
+<h1 class="page-title">Выгрузка</h1>
+<p class="page-hint" id="exportSummary"></p>
+<button type="button" class="btn btn-primary btn-block" id="btnShare">Поделиться / отправить</button>
+<button type="button" class="btn btn-block" id="btnCopy">Скопировать текст</button>
+<button type="button" class="btn btn-block" id="btnCsv">Скачать CSV (Excel)</button>
+<button type="button" class="btn btn-block" id="btnJson">Скачать JSON</button>
+<button type="button" class="btn btn-ghost btn-block" id="btnBackForm">← К замеру</button>
+<pre id="exportPreview" class="export-preview"></pre>
+</div></main>
+<div id="toast" class="toast" hidden></div>
+<script src="js/app.js"></script>
+</body>
+</html>
