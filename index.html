@@ -47,9 +47,10 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 .win-photos{margin-top:10px}.photos-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .photo-thumb{position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--line);flex-shrink:0;background:var(--card)}
 .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.photo-thumb button{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.7);color:#fff;font-size:14px;line-height:1;cursor:pointer;padding:0}
-.photo-add{width:72px;height:72px;border-radius:8px;border:1.5px dashed var(--line);background:var(--card);color:var(--muted);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;-webkit-appearance:none;font-family:inherit}
-.photo-add input{display:none}.photo-add span{font-size:20px;color:var(--gold);line-height:1}
+.photo-thumb button{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.75);color:#fff;font-size:14px;line-height:1;cursor:pointer;padding:0}
+.photo-actions{display:flex;gap:6px;flex-wrap:wrap}
+.photo-btn{min-height:40px;padding:8px 10px;font-size:12px;font-weight:600;border-radius:8px;border:1.5px dashed var(--line);background:var(--card);color:var(--muted);cursor:pointer;font-family:inherit;-webkit-appearance:none;display:inline-flex;align-items:center;gap:4px}
+.photo-btn input{display:none}.photo-btn span{color:var(--gold)}
 .total-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:14px}.total-bar strong{font-size:18px;color:var(--gold);font-weight:800;white-space:nowrap}
 .actions-sticky{position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;justify-content:center;pointer-events:none}
 .actions-sticky-inner{width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1.35fr;gap:10px;padding:10px var(--pad);padding-bottom:calc(10px + var(--safe-b));background:rgba(10,10,12,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);pointer-events:auto}.actions-sticky-inner .btn{margin:0}
@@ -65,7 +66,7 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 <header class="header"><div class="header-brand"><span class="logo">ПЛЕНКИН</span><span class="logo-sub">Замер остекления</span></div><button type="button" class="btn-icon" id="btnHome" hidden>☰</button></header>
 <main id="screenList" class="screen"><div class="page-pad no-sticky">
 <h1 class="page-title">Объекты</h1>
-<p class="page-hint">Замер на объекте. Данные и фото сохраняются на устройстве.</p>
+<p class="page-hint">Замер на объекте. Данные и фото хранятся в приложении на устройстве.</p>
 <button type="button" class="btn btn-primary btn-block" id="btnNew">+ Новый замер</button>
 <div id="objectsList" class="objects-list"></div>
 <p id="emptyState" class="empty">Пока нет замеров.<br>Нажмите «Новый замер».</p>
@@ -96,8 +97,9 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 <h1 class="page-title">Выгрузка</h1>
 <p class="page-hint" id="exportSummary"></p>
 <div class="export-actions">
-<button type="button" class="btn btn-primary" id="btnShare">Поделиться / отправить</button>
+<button type="button" class="btn btn-primary" id="btnShare">Поделиться (текст + фото)</button>
 <button type="button" class="btn" id="btnCopy">Скопировать текст</button>
+<button type="button" class="btn" id="btnDlPhotos">Скачать все фото</button>
 <button type="button" class="btn" id="btnCsv">Скачать CSV (Excel)</button>
 <button type="button" class="btn" id="btnJson">Скачать JSON</button>
 <button type="button" class="btn btn-ghost" id="btnBackForm">← К замеру</button>
@@ -108,27 +110,117 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 <div id="toast" class="toast" hidden></div>
 <script>
 (function(){
-var SK="plenkina_zamer_v2",SURV="plenkina_surveyor",MAXW=4,MAXO=6;
+var SK="plenkina_zamer_v3",SURV="plenkina_surveyor",MAXW=5,MAXO=8;
 function $(id){return document.getElementById(id)}
 var state={objects:loadAll(),currentId:null};
-function loadAll(){try{return JSON.parse(localStorage.getItem(SK)||localStorage.getItem("plenkina_zamer_v1")||"[]")}catch(e){return[]}}
-function saveAll(){try{localStorage.setItem(SK,JSON.stringify(state.objects))}catch(e){toast("Мало места: удалите фото")}}
+
+function loadAll(){
+  try{
+    var raw=localStorage.getItem(SK)||localStorage.getItem("plenkina_zamer_v2")||localStorage.getItem("plenkina_zamer_v1")||"[]";
+    return JSON.parse(raw);
+  }catch(e){return[]}
+}
+function saveAll(){
+  try{localStorage.setItem(SK,JSON.stringify(state.objects));return true}
+  catch(e){
+    toast("Мало места — удалите старые фото");
+    return false;
+  }
+}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function today(){return new Date().toISOString().slice(0,10)}
 function fmtArea(m2){return m2.toFixed(2).replace(".",",")+" м²"}
-function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(t._timer);t._timer=setTimeout(function(){t.hidden=true},2200)}
+function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(t._timer);t._timer=setTimeout(function(){t.hidden=true},2400)}
 function filmLabel(v){var m={athermal:"Атермальная / солнцезащита",k4:"К4",r1a:"Р1А",r2a:"Р2А",r3a:"Р3А",r4a:"Р4А",matte:"Матирование / декор",print:"Фотопечать",smart:"Смарт",other:"Другое"};return m[v]||"—"}
 function show(s){$("screenList").hidden=s!=="list";$("screenForm").hidden=s!=="form";$("screenExport").hidden=s!=="export";$("btnHome").hidden=s==="list";window.scrollTo(0,0)}
 function esc(s){var d=document.createElement("div");d.textContent=String(s);return d.innerHTML}
 function calcTotal(obj){if(!obj||!obj.windows)return 0;return obj.windows.reduce(function(s,w){return s+area(w.w,w.h,w.qty)},0)}
 function area(w,h,q){return ((parseFloat(w)||0)/1000)*((parseFloat(h)||0)/1000)*(parseFloat(q)||1)}
 function countPhotos(obj){var n=(obj.photos||[]).length;(obj.windows||[]).forEach(function(w){n+=(w.photos||[]).length});return n}
-function compressImage(file,maxW,q){return new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(){var img=new Image();img.onload=function(){var w=img.width,h=img.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW}var c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);resolve(c.toDataURL("image/jpeg",q))};img.onerror=reject;img.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
+
+function compressImage(file){
+  return new Promise(function(resolve,reject){
+    if(!file||!file.type||file.type.indexOf("image")!==0){reject(new Error("not image"));return}
+    var r=new FileReader();
+    r.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var maxW=900,w=img.width,h=img.height;
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW}
+        var c=document.createElement("canvas");c.width=w;c.height=h;
+        var ctx=c.getContext("2d");ctx.drawImage(img,0,0,w,h);
+        var q=0.72;
+        var data=c.toDataURL("image/jpeg",q);
+        if(data.length>900000){data=c.toDataURL("image/jpeg",0.55)}
+        resolve(data);
+      };
+      img.onerror=function(){reject(new Error("img"))};
+      img.src=r.result;
+    };
+    r.onerror=function(){reject(new Error("read"))};
+    r.readAsDataURL(file);
+  });
+}
+
+function dataURLtoBlob(dataURL){
+  var parts=dataURL.split(",");
+  var mime=(parts[0].match(/:(.*?);/)||[])[1]||"image/jpeg";
+  var bstr=atob(parts[1]);
+  var n=bstr.length,u8=new Uint8Array(n);
+  while(n--)u8[n]=bstr.charCodeAt(n);
+  return new Blob([u8],{type:mime});
+}
+
+function makeFileInput(multiple,capture){
+  var inp=document.createElement("input");
+  inp.type="file";
+  inp.accept="image/*";
+  if(multiple)inp.multiple=true;
+  if(capture)inp.setAttribute("capture",capture);
+  return inp;
+}
+
+function handleFiles(fileList,onAdd,maxLeft){
+  var files=Array.prototype.slice.call(fileList||[]).filter(function(f){return f.type&&f.type.indexOf("image")===0});
+  if(!files.length){toast("Выберите изображение");return}
+  var slice=files.slice(0,Math.max(0,maxLeft));
+  var i=0;
+  function next(){
+    if(i>=slice.length)return;
+    var f=slice[i++];
+    compressImage(f).then(function(data){onAdd(data);next()}).catch(function(){toast("Ошибка фото");next()});
+  }
+  next();
+}
+
 function renderPhotoRow(box,photos,onAdd,onRem,max){
   box.innerHTML="";
-  (photos||[]).forEach(function(src,i){var d=document.createElement("div");d.className="photo-thumb";d.innerHTML="<img alt=\"\">";d.querySelector("img").src=src;var b=document.createElement("button");b.type="button";b.textContent="×";b.onclick=function(e){e.stopPropagation();onRem(i)};d.appendChild(b);box.appendChild(d)});
-  if((photos||[]).length<max){var lab=document.createElement("label");lab.className="photo-add";lab.innerHTML="<span>📷</span>Фото";var inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.setAttribute("capture","environment");inp.onchange=function(e){var f=e.target.files&&e.target.files[0];if(!f)return;compressImage(f,720,0.62).then(onAdd).catch(function(){toast("Ошибка фото")});e.target.value=""};lab.appendChild(inp);box.appendChild(lab)}
+  (photos||[]).forEach(function(src,i){
+    var d=document.createElement("div");d.className="photo-thumb";
+    var img=document.createElement("img");img.alt="";img.src=src;d.appendChild(img);
+    var b=document.createElement("button");b.type="button";b.textContent="×";
+    b.onclick=function(e){e.stopPropagation();onRem(i)};
+    d.appendChild(b);box.appendChild(d);
+  });
+  var left=max-(photos||[]).length;
+  if(left<=0)return;
+  var actions=document.createElement("div");actions.className="photo-actions";
+
+  var gal=document.createElement("label");gal.className="photo-btn";
+  gal.innerHTML="<span>🖼</span> Галерея";
+  var gin=makeFileInput(true,null);
+  gin.onchange=function(e){handleFiles(e.target.files,onAdd,left);e.target.value=""};
+  gal.appendChild(gin);actions.appendChild(gal);
+
+  var cam=document.createElement("label");cam.className="photo-btn";
+  cam.innerHTML="<span>📷</span> Камера";
+  var cin=makeFileInput(false,"environment");
+  cin.onchange=function(e){handleFiles(e.target.files,onAdd,left);e.target.value=""};
+  cam.appendChild(cin);actions.appendChild(cam);
+
+  box.appendChild(actions);
 }
+
 function renderList(){
   var list=$("objectsList"),empty=$("emptyState");list.innerHTML="";
   var items=state.objects.slice().sort(function(a,b){return(b.updated||b.created)-(a.updated||a.created)});
@@ -146,25 +238,89 @@ function renderList(){
     wrap.appendChild(btn);wrap.appendChild(del);list.appendChild(wrap);
   });
 }
+
 function blankWindow(){return{id:uid(),w:"",h:"",qty:"1",note:"",photos:[]}}
 function blankObject(){return{id:uid(),address:"",client:"",phone:"",date:today(),surveyor:localStorage.getItem(SURV)||"",film:"",notes:"",photos:[],windows:[blankWindow()],created:Date.now(),updated:Date.now()}}
-function openObject(id){state.currentId=id;var obj=state.objects.find(function(o){return o.id===id});if(!obj)return;if(!obj.photos)obj.photos=[];(obj.windows||[]).forEach(function(w){if(!w.photos)w.photos=[]});fillForm(obj);show("form")}
+
+function openObject(id){
+  state.currentId=id;
+  var obj=state.objects.find(function(o){return o.id===id});
+  if(!obj)return;
+  if(!obj.photos)obj.photos=[];
+  (obj.windows||[]).forEach(function(w){if(!w.photos)w.photos=[]});
+  fillForm(obj);show("form");
+}
 function newObject(){var obj=blankObject();state.objects.unshift(obj);state.currentId=obj.id;saveAll();fillForm(obj);show("form")}
-function fillForm(obj){$("fAddress").value=obj.address||"";$("fClient").value=obj.client||"";$("fPhone").value=obj.phone||"";$("fDate").value=obj.date||today();$("fSurveyor").value=obj.surveyor||"";$("fFilm").value=obj.film||"";$("fNotes").value=obj.notes||"";renderObjPhotos(obj);renderWindows(obj.windows||[]);updateTotal()}
-function renderObjPhotos(obj){renderPhotoRow($("objPhotos"),obj.photos||[],function(d){obj.photos=obj.photos||[];obj.photos.push(d);saveAll();renderObjPhotos(obj)},function(i){obj.photos.splice(i,1);saveAll();renderObjPhotos(obj)},MAXO)}
-function collectWindows(){var list=[];document.querySelectorAll(".win-card").forEach(function(card){var id=card.dataset.id;var prev=(state.objects.find(function(o){return o.id===state.currentId})||{}).windows||[];var old=prev.find(function(w){return w.id===id})||{};list.push({id:id,w:card.querySelector('[data-f="w"]').value,h:card.querySelector('[data-f="h"]').value,qty:card.querySelector('[data-f="qty"]').value||"1",note:card.querySelector('[data-f="note"]').value.trim(),photos:old.photos||[]})});return list}
-function readForm(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return null;obj.address=$("fAddress").value.trim();obj.client=$("fClient").value.trim();obj.phone=$("fPhone").value.trim();obj.date=$("fDate").value;obj.surveyor=$("fSurveyor").value.trim();obj.film=$("fFilm").value;obj.notes=$("fNotes").value.trim();obj.windows=collectWindows();obj.updated=Date.now();if(obj.surveyor)localStorage.setItem(SURV,obj.surveyor);return obj}
-function updateWinArea(card){card.querySelector("[data-area]").textContent=fmtArea(area(card.querySelector('[data-f="w"]').value,card.querySelector('[data-f="h"]').value,card.querySelector('[data-f="qty"]').value))}
-function updateTotal(){$("totalArea").textContent=fmtArea(collectWindows().reduce(function(s,w){return s+area(w.w,w.h,w.qty)},0))}
+
+function fillForm(obj){
+  $("fAddress").value=obj.address||"";$("fClient").value=obj.client||"";$("fPhone").value=obj.phone||"";
+  $("fDate").value=obj.date||today();$("fSurveyor").value=obj.surveyor||"";$("fFilm").value=obj.film||"";$("fNotes").value=obj.notes||"";
+  renderObjPhotos(obj);renderWindows(obj.windows||[]);updateTotal();
+}
+
+function renderObjPhotos(obj){
+  renderPhotoRow($("objPhotos"),obj.photos||[],
+    function(d){obj.photos=obj.photos||[];if(obj.photos.length>=MAXO)return;obj.photos.push(d);saveAll();renderObjPhotos(obj);toast("Фото добавлено")},
+    function(i){obj.photos.splice(i,1);saveAll();renderObjPhotos(obj)},
+    MAXO);
+}
+
+function collectWindows(){
+  var list=[];
+  document.querySelectorAll(".win-card").forEach(function(card){
+    var id=card.dataset.id;
+    var prev=(state.objects.find(function(o){return o.id===state.currentId})||{}).windows||[];
+    var old=prev.find(function(w){return w.id===id})||{};
+    list.push({
+      id:id,
+      w:card.querySelector('[data-f="w"]').value,
+      h:card.querySelector('[data-f="h"]').value,
+      qty:card.querySelector('[data-f="qty"]').value||"1",
+      note:card.querySelector('[data-f="note"]').value.trim(),
+      photos:old.photos||[]
+    });
+  });
+  return list;
+}
+
+function readForm(){
+  var obj=state.objects.find(function(o){return o.id===state.currentId});
+  if(!obj)return null;
+  obj.address=$("fAddress").value.trim();obj.client=$("fClient").value.trim();obj.phone=$("fPhone").value.trim();
+  obj.date=$("fDate").value;obj.surveyor=$("fSurveyor").value.trim();obj.film=$("fFilm").value;obj.notes=$("fNotes").value.trim();
+  obj.windows=collectWindows();obj.updated=Date.now();
+  if(obj.surveyor)localStorage.setItem(SURV,obj.surveyor);
+  return obj;
+}
+
+function updateWinArea(card){
+  card.querySelector("[data-area]").textContent=fmtArea(area(
+    card.querySelector('[data-f="w"]').value,
+    card.querySelector('[data-f="h"]').value,
+    card.querySelector('[data-f="qty"]').value
+  ));
+}
+function updateTotal(){
+  $("totalArea").textContent=fmtArea(collectWindows().reduce(function(s,w){return s+area(w.w,w.h,w.qty)},0));
+}
 function renumber(){document.querySelectorAll(".win-card").forEach(function(c,i){c.querySelector(".win-num").textContent="№ "+(i+1)})}
+
 function bindWin(card,win){
   card.querySelector("[data-del]").onclick=function(){card.remove();renumber();updateTotal();readForm();saveAll()};
-  card.querySelectorAll("input[data-f]").forEach(function(inp){inp.addEventListener("input",function(){updateWinArea(card);updateTotal()})});
+  card.querySelectorAll("input[data-f]").forEach(function(inp){
+    inp.addEventListener("input",function(){updateWinArea(card);updateTotal()});
+  });
   updateWinArea(card);
   var box=card.querySelector("[data-photos]");
-  function refresh(){renderPhotoRow(box,win.photos||[],function(d){win.photos=win.photos||[];win.photos.push(d);readForm();saveAll();refresh()},function(i){win.photos.splice(i,1);readForm();saveAll();refresh()},MAXW)}
+  function refresh(){
+    renderPhotoRow(box,win.photos||[],
+      function(d){win.photos=win.photos||[];if(win.photos.length>=MAXW)return;win.photos.push(d);readForm();saveAll();refresh();toast("Фото добавлено")},
+      function(i){win.photos.splice(i,1);readForm();saveAll();refresh()},
+      MAXW);
+  }
   refresh();
 }
+
 function renderWindows(windows){
   var wrap=$("windowsList");wrap.innerHTML="";
   windows.forEach(function(win,i){
@@ -178,26 +334,159 @@ function renderWindows(windows){
     wrap.appendChild(card);bindWin(card,win);
   });
 }
-function addWindow(){var obj=readForm();if(!obj)return;var win=blankWindow();obj.windows.push(win);saveAll();renderWindows(obj.windows);updateTotal();var cards=document.querySelectorAll(".win-card");if(cards.length)cards[cards.length-1].querySelector('[data-f="w"]').focus()}
-function saveCurrent(){var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес");$("fAddress").focus();return}saveAll();toast("Сохранено")}
-function buildText(obj){var a=calcTotal(obj),ph=countPhotos(obj),t="ПЛЕНКИН — ЗАМЕР ОСТЕКЛЕНИЯ\n────────────────────────\nАдрес: "+obj.address+"\n";if(obj.client)t+="Клиент: "+obj.client+"\n";if(obj.phone)t+="Телефон: "+obj.phone+"\n";t+="Дата: "+(obj.date||"—")+"\n";if(obj.surveyor)t+="Замерщик: "+obj.surveyor+"\n";t+="Плёнка: "+filmLabel(obj.film)+"\n";if(obj.notes)t+="Комментарий: "+obj.notes+"\n";if(ph)t+="Фото: "+ph+" шт.\n";t+="────────────────────────\nПозиции:\n";(obj.windows||[]).forEach(function(w,i){t+=(i+1)+". "+(w.w||"?")+"×"+(w.h||"?")+" мм × "+(w.qty||1)+" шт = "+fmtArea(area(w.w,w.h,w.qty));if(w.note)t+=" ("+w.note+")";if(w.photos&&w.photos.length)t+=" [фото: "+w.photos.length+"]";t+="\n"});t+="────────────────────────\nИТОГО: "+fmtArea(a)+"\n\nwww.plenkinaokna.ru · +7 985 780 13 75\n";return t}
-function allPhotos(obj){var arr=[];(obj.photos||[]).forEach(function(p){arr.push(p)});(obj.windows||[]).forEach(function(w){(w.photos||[]).forEach(function(p){arr.push(p)})});return arr}
-function buildCsv(obj){var rows=[["Адрес","Клиент","Телефон","Дата","Замерщик","Плёнка","№","Ширина мм","Высота мм","Кол-во","Площадь м2","Примечание","Фото шт","Комментарий"]];(obj.windows||[]).forEach(function(w,i){rows.push([obj.address,obj.client,obj.phone,obj.date,obj.surveyor,filmLabel(obj.film),i+1,w.w,w.h,w.qty||1,area(w.w,w.h,w.qty).toFixed(3),w.note,(w.photos||[]).length,obj.notes])});return rows.map(function(r){return r.map(function(c){return '"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(";")}).join("\n")}
-function openExport(){var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес");return}saveAll();var ph=countPhotos(obj);$("exportSummary").textContent=obj.address+" · "+obj.windows.length+" поз. · "+fmtArea(calcTotal(obj))+(ph?" · 📷 "+ph:"");$("exportPreview").textContent=buildText(obj);var box=$("exportPhotos");box.innerHTML="";allPhotos(obj).forEach(function(src){var img=document.createElement("img");img.src=src;box.appendChild(img)});show("export")}
-function download(name,content,mime){var blob=new Blob(["\ufeff"+content],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-function shareText(obj){var text=buildText(obj);if(navigator.share){navigator.share({title:"Замер ПЛЕНКИН",text:text}).catch(function(e){if(e.name!=="AbortError")navigator.clipboard.writeText(text).then(function(){toast("Скопировано")})});return}navigator.clipboard.writeText(text).then(function(){toast("Скопировано")})}
+
+function addWindow(){
+  var obj=readForm();if(!obj)return;
+  var win=blankWindow();obj.windows.push(win);saveAll();renderWindows(obj.windows);updateTotal();
+  var cards=document.querySelectorAll(".win-card");
+  if(cards.length)cards[cards.length-1].querySelector('[data-f="w"]').focus();
+}
+
+function saveCurrent(){
+  var obj=readForm();if(!obj)return;
+  if(!obj.address){toast("Укажите адрес");$("fAddress").focus();return}
+  if(saveAll())toast("Сохранено");
+}
+
+function buildText(obj){
+  var a=calcTotal(obj),ph=countPhotos(obj),t="ПЛЕНКИН — ЗАМЕР ОСТЕКЛЕНИЯ\n────────────────────────\nАдрес: "+obj.address+"\n";
+  if(obj.client)t+="Клиент: "+obj.client+"\n";
+  if(obj.phone)t+="Телефон: "+obj.phone+"\n";
+  t+="Дата: "+(obj.date||"—")+"\n";
+  if(obj.surveyor)t+="Замерщик: "+obj.surveyor+"\n";
+  t+="Плёнка: "+filmLabel(obj.film)+"\n";
+  if(obj.notes)t+="Комментарий: "+obj.notes+"\n";
+  if(ph)t+="Фото: "+ph+" шт. (во вложении)\n";
+  t+="────────────────────────\nПозиции:\n";
+  (obj.windows||[]).forEach(function(w,i){
+    t+=(i+1)+". "+(w.w||"?")+"×"+(w.h||"?")+" мм × "+(w.qty||1)+" шт = "+fmtArea(area(w.w,w.h,w.qty));
+    if(w.note)t+=" ("+w.note+")";
+    if(w.photos&&w.photos.length)t+=" [фото: "+w.photos.length+"]";
+    t+="\n";
+  });
+  t+="────────────────────────\nИТОГО: "+fmtArea(a)+"\n\nwww.plenkinaokna.ru · +7 985 780 13 75\n";
+  return t;
+}
+
+function allPhotos(obj){
+  var arr=[];
+  (obj.photos||[]).forEach(function(p){arr.push(p)});
+  (obj.windows||[]).forEach(function(w){(w.photos||[]).forEach(function(p){arr.push(p)})});
+  return arr;
+}
+
+function buildCsv(obj){
+  var rows=[["Адрес","Клиент","Телефон","Дата","Замерщик","Плёнка","№","Ширина мм","Высота мм","Кол-во","Площадь м2","Примечание","Фото шт","Комментарий"]];
+  (obj.windows||[]).forEach(function(w,i){
+    rows.push([obj.address,obj.client,obj.phone,obj.date,obj.surveyor,filmLabel(obj.film),i+1,w.w,w.h,w.qty||1,area(w.w,w.h,w.qty).toFixed(3),w.note,(w.photos||[]).length,obj.notes]);
+  });
+  return rows.map(function(r){return r.map(function(c){return '"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(";")}).join("\n");
+}
+
+function openExport(){
+  var obj=readForm();if(!obj)return;
+  if(!obj.address){toast("Укажите адрес");return}
+  saveAll();
+  var ph=countPhotos(obj);
+  $("exportSummary").textContent=obj.address+" · "+obj.windows.length+" поз. · "+fmtArea(calcTotal(obj))+(ph?" · 📷 "+ph:"");
+  $("exportPreview").textContent=buildText(obj);
+  var box=$("exportPhotos");box.innerHTML="";
+  allPhotos(obj).forEach(function(src){var img=document.createElement("img");img.src=src;box.appendChild(img)});
+  show("export");
+}
+
+function downloadBlob(name,blob){
+  var url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},1500);
+}
+function download(name,content,mime){
+  downloadBlob(name,new Blob(["\ufeff"+content],{type:mime}));
+}
+
+function downloadAllPhotos(obj){
+  var photos=allPhotos(obj);
+  if(!photos.length){toast("Нет фото");return}
+  photos.forEach(function(src,i){
+    setTimeout(function(){
+      downloadBlob("photo_"+(i+1)+".jpg",dataURLtoBlob(src));
+    },i*350);
+  });
+  toast("Скачивание "+photos.length+" фото…");
+}
+
+function shareAll(obj){
+  var text=buildText(obj);
+  var photos=allPhotos(obj).slice(0,12);
+  var files=[];
+  try{
+    photos.forEach(function(src,i){
+      files.push(new File([dataURLtoBlob(src)],"photo_"+(i+1)+".jpg",{type:"image/jpeg"}));
+    });
+  }catch(e){}
+
+  if(navigator.share){
+    var payload={title:"Замер ПЛЕНКИН",text:text};
+    if(files.length){
+      try{
+        if(!navigator.canShare||navigator.canShare({files:files})){
+          payload.files=files;
+        }
+      }catch(e){}
+    }
+    navigator.share(payload).then(function(){
+      toast(payload.files?"Отправлено с фото":"Отправлен текст");
+    }).catch(function(e){
+      if(e&&e.name==="AbortError")return;
+      if(payload.files){
+        navigator.share({title:"Замер ПЛЕНКИН",text:text}).catch(function(){
+          navigator.clipboard.writeText(text).then(function(){toast("Текст скопирован. Фото: «Скачать все фото»")});
+        });
+      }else{
+        navigator.clipboard.writeText(text).then(function(){toast("Скопировано")});
+      }
+    });
+    return;
+  }
+  navigator.clipboard.writeText(text).then(function(){
+    toast(photos.length?"Текст скопирован. Скачайте фото кнопкой ниже":"Скопировано");
+  });
+}
+
 $("btnNew").onclick=newObject;
 $("btnHome").onclick=function(){readForm();saveAll();renderList();show("list")};
 $("btnAddWin").onclick=addWindow;
 $("btnSave").onclick=saveCurrent;
 $("btnExport").onclick=openExport;
 $("btnBackForm").onclick=function(){show("form")};
-$("btnDeleteObj").onclick=function(){if(!confirm("Удалить этот замер полностью?"))return;state.objects=state.objects.filter(function(o){return o.id!==state.currentId});saveAll();renderList();show("list");toast("Удалено")};
-$("btnCopy").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;navigator.clipboard.writeText(buildText(obj)).then(function(){toast("Скопировано")})};
-$("btnShare").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(obj)shareText(obj)};
-$("btnCsv").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;var name=(obj.address||"zamer").replace(/[\\/:*?\"<>|]/g,"_").slice(0,40);download("zamer_"+name+".csv",buildCsv(obj),"text/csv;charset=utf-8");toast("CSV скачан")};
-$("btnJson").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;var name=(obj.address||"zamer").replace(/[\\/:*?\"<>|]/g,"_").slice(0,40);download("zamer_"+name+".json",JSON.stringify(obj,null,2),"application/json");toast("JSON скачан")};
-["fAddress","fClient","fPhone","fDate","fSurveyor","fFilm","fNotes"].forEach(function(id){$(id).addEventListener("change",function(){readForm();saveAll()})});
+$("btnDeleteObj").onclick=function(){
+  if(!confirm("Удалить этот замер полностью?"))return;
+  state.objects=state.objects.filter(function(o){return o.id!==state.currentId});
+  saveAll();renderList();show("list");toast("Удалено");
+};
+$("btnCopy").onclick=function(){
+  var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;
+  navigator.clipboard.writeText(buildText(obj)).then(function(){toast("Скопировано")});
+};
+$("btnShare").onclick=function(){
+  var obj=state.objects.find(function(o){return o.id===state.currentId});if(obj)shareAll(obj);
+};
+$("btnDlPhotos").onclick=function(){
+  var obj=state.objects.find(function(o){return o.id===state.currentId});if(obj)downloadAllPhotos(obj);
+};
+$("btnCsv").onclick=function(){
+  var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;
+  var name=(obj.address||"zamer").replace(/[\\/:*?\"<>|]/g,"_").slice(0,40);
+  download("zamer_"+name+".csv",buildCsv(obj),"text/csv;charset=utf-8");toast("CSV скачан");
+};
+$("btnJson").onclick=function(){
+  var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;
+  var name=(obj.address||"zamer").replace(/[\\/:*?\"<>|]/g,"_").slice(0,40);
+  download("zamer_"+name+".json",JSON.stringify(obj,null,2),"application/json");toast("JSON скачан");
+};
+["fAddress","fClient","fPhone","fDate","fSurveyor","fFilm","fNotes"].forEach(function(id){
+  $(id).addEventListener("change",function(){readForm();saveAll()});
+});
 renderList();show("list");
 })();
 </script>
