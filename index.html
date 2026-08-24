@@ -41,7 +41,7 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 .win-card{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;width:100%;overflow:hidden}.win-card:last-child{margin-bottom:0}
 .win-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
 .win-num{font-size:12px;font-weight:700;color:var(--gold)}
-.win-grid{display:grid;grid-template-columns:1fr 1fr .75fr;gap:8px;width:100%}.win-grid .field{margin-bottom:0}.win-grid input{padding:10px 6px;text-align:center;font-variant-numeric:tabular-nums}
+.win-grid{display:grid;grid-template-columns:1fr 1fr .75fr;gap:8px;width:100%}.win-grid .field{margin-bottom:0}.win-grid input{padding:10px 6px;text-align:center}
 .win-note{margin-top:10px;width:100%}.win-note input{width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;color:var(--text);outline:none;-webkit-appearance:none}.win-note input:focus{border-color:var(--gold)}.win-note input::placeholder{color:var(--muted)}
 .win-area{margin-top:8px;font-size:13px;color:var(--muted)}.win-area strong{color:var(--gold);font-weight:700}
 .win-photos{margin-top:10px}.photos-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -50,7 +50,6 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 .photo-thumb button{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.7);color:#fff;font-size:14px;line-height:1;cursor:pointer;padding:0}
 .photo-add{width:72px;height:72px;border-radius:8px;border:1.5px dashed var(--line);background:var(--card);color:var(--muted);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;-webkit-appearance:none;font-family:inherit}
 .photo-add input{display:none}.photo-add span{font-size:20px;color:var(--gold);line-height:1}
-.obj-photos-block{margin-top:4px}
 .total-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:14px}.total-bar strong{font-size:18px;color:var(--gold);font-weight:800;white-space:nowrap}
 .actions-sticky{position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;justify-content:center;pointer-events:none}
 .actions-sticky-inner{width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1.35fr;gap:10px;padding:10px var(--pad);padding-bottom:calc(10px + var(--safe-b));background:rgba(10,10,12,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);pointer-events:auto}.actions-sticky-inner .btn{margin:0}
@@ -64,7 +63,6 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 </head>
 <body>
 <header class="header"><div class="header-brand"><span class="logo">ПЛЕНКИН</span><span class="logo-sub">Замер остекления</span></div><button type="button" class="btn-icon" id="btnHome" hidden>☰</button></header>
-
 <main id="screenList" class="screen"><div class="page-pad no-sticky">
 <h1 class="page-title">Объекты</h1>
 <p class="page-hint">Замер на объекте. Данные и фото сохраняются на устройстве.</p>
@@ -72,7 +70,6 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 <div id="objectsList" class="objects-list"></div>
 <p id="emptyState" class="empty">Пока нет замеров.<br>Нажмите «Новый замер».</p>
 </div></main>
-
 <main id="screenForm" class="screen" hidden><div class="page-pad">
 <div class="form-section">
 <h2 class="section-title">Объект</h2>
@@ -81,29 +78,20 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 <div class="row-2"><label class="field"><span>Дата</span><input type="date" id="fDate"></label><label class="field"><span>Замерщик</span><input type="text" id="fSurveyor" placeholder="Ваше имя"></label></div>
 <label class="field"><span>Тип плёнки</span><select id="fFilm"><option value="">— не выбран —</option><option value="athermal">Атермальная / солнцезащита</option><option value="k4">К4</option><option value="r1a">Р1А</option><option value="r2a">Р2А</option><option value="r3a">Р3А</option><option value="r4a">Р4А</option><option value="matte">Матирование / декор</option><option value="print">Фотопечать</option><option value="smart">Смарт</option><option value="other">Другое</option></select></label>
 <label class="field"><span>Комментарий</span><textarea id="fNotes" rows="2" placeholder="Доступ, этаж, особенности…"></textarea></label>
-<div class="obj-photos-block">
-<span style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:8px">Фото объекта</span>
-<div class="photos-row" id="objPhotos"></div>
+<div style="margin-top:4px"><span style="font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:8px">Фото объекта</span><div class="photos-row" id="objPhotos"></div></div>
 </div>
-</div>
-
 <div class="form-section">
 <div class="section-head"><h2 class="section-title">Окна / стёкла</h2><button type="button" class="btn btn-sm" id="btnAddWin">+ Добавить</button></div>
 <div id="windowsList"></div>
 <div class="total-bar"><span>Итого площадь</span><strong id="totalArea">0,00 м²</strong></div>
 </div>
-
-<div class="form-footer-actions">
-<button type="button" class="btn btn-danger btn-block" id="btnDeleteObj" style="width:100%;min-height:44px;border-width:1.5px">Удалить этот замер</button>
+<div class="form-footer-actions"><button type="button" class="btn btn-danger btn-block" id="btnDeleteObj" style="width:100%;min-height:44px">Удалить этот замер</button></div>
 </div>
-</div>
-
 <div class="actions-sticky"><div class="actions-sticky-inner">
 <button type="button" class="btn btn-ghost" id="btnSave">Сохранить</button>
 <button type="button" class="btn btn-primary" id="btnExport">Выгрузить</button>
 </div></div>
 </main>
-
 <main id="screenExport" class="screen" hidden><div class="page-pad no-sticky">
 <h1 class="page-title">Выгрузка</h1>
 <p class="page-hint" id="exportSummary"></p>
@@ -117,71 +105,30 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Robot
 <pre id="exportPreview" class="export-preview"></pre>
 <div id="exportPhotos" class="export-photos"></div>
 </div></main>
-
 <div id="toast" class="toast" hidden></div>
-
 <script>
 (function(){
-var STORAGE_KEY="plenkina_zamer_v2",SURVEYOR_KEY="plenkina_surveyor",MAX_PHOTOS_WIN=4,MAX_PHOTOS_OBJ=6;
+var SK="plenkina_zamer_v2",SURV="plenkina_surveyor",MAXW=4,MAXO=6;
 function $(id){return document.getElementById(id)}
 var state={objects:loadAll(),currentId:null};
-
-function loadAll(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||localStorage.getItem("plenkina_zamer_v1")||"[]")}catch(e){return[]}}
-function saveAll(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state.objects))}
-  catch(e){toast("Мало места: удалите старые фото");}
-}
+function loadAll(){try{return JSON.parse(localStorage.getItem(SK)||localStorage.getItem("plenkina_zamer_v1")||"[]")}catch(e){return[]}}
+function saveAll(){try{localStorage.setItem(SK,JSON.stringify(state.objects))}catch(e){toast("Мало места: удалите фото")}}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function today(){return new Date().toISOString().slice(0,10)}
 function fmtArea(m2){return m2.toFixed(2).replace(".",",")+" м²"}
 function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(t._timer);t._timer=setTimeout(function(){t.hidden=true},2200)}
-function filmLabel(v){var map={athermal:"Атермальная / солнцезащита",k4:"К4",r1a:"Р1А",r2a:"Р2А",r3a:"Р3А",r4a:"Р4А",matte:"Матирование / декор",print:"Фотопечать",smart:"Смарт",other:"Другое"};return map[v]||"—"}
-function show(screen){$("screenList").hidden=screen!=="list";$("screenForm").hidden=screen!=="form";$("screenExport").hidden=screen!=="export";$("btnHome").hidden=screen==="list";window.scrollTo(0,0)}
-function escapeHtml(s){return String(s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/\"/g,""")}
-function calcTotal(obj){if(!obj||!obj.windows)return 0;return obj.windows.reduce(function(s,w){return s+winAreaM2(w.w,w.h,w.qty)},0)}
-function winAreaM2(w,h,q){return ((parseFloat(w)||0)/1000)*((parseFloat(h)||0)/1000)*(parseFloat(q)||1)}
-function countPhotos(obj){var n=(obj.photos||[]).length; (obj.windows||[]).forEach(function(w){n+=(w.photos||[]).length});return n}
-
-function compressImage(file,maxW,quality){
-  return new Promise(function(resolve,reject){
-    var reader=new FileReader();
-    reader.onload=function(){
-      var img=new Image();
-      img.onload=function(){
-        var w=img.width,h=img.height;
-        if(w>maxW){h=Math.round(h*maxW/w);w=maxW}
-        var c=document.createElement("canvas");c.width=w;c.height=h;
-        c.getContext("2d").drawImage(img,0,0,w,h);
-        resolve(c.toDataURL("image/jpeg",quality));
-      };
-      img.onerror=reject;
-      img.src=reader.result;
-    };
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
-  });
+function filmLabel(v){var m={athermal:"Атермальная / солнцезащита",k4:"К4",r1a:"Р1А",r2a:"Р2А",r3a:"Р3А",r4a:"Р4А",matte:"Матирование / декор",print:"Фотопечать",smart:"Смарт",other:"Другое"};return m[v]||"—"}
+function show(s){$("screenList").hidden=s!=="list";$("screenForm").hidden=s!=="form";$("screenExport").hidden=s!=="export";$("btnHome").hidden=s==="list";window.scrollTo(0,0)}
+function esc(s){var d=document.createElement("div");d.textContent=String(s);return d.innerHTML}
+function calcTotal(obj){if(!obj||!obj.windows)return 0;return obj.windows.reduce(function(s,w){return s+area(w.w,w.h,w.qty)},0)}
+function area(w,h,q){return ((parseFloat(w)||0)/1000)*((parseFloat(h)||0)/1000)*(parseFloat(q)||1)}
+function countPhotos(obj){var n=(obj.photos||[]).length;(obj.windows||[]).forEach(function(w){n+=(w.photos||[]).length});return n}
+function compressImage(file,maxW,q){return new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(){var img=new Image();img.onload=function(){var w=img.width,h=img.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW}var c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);resolve(c.toDataURL("image/jpeg",q))};img.onerror=reject;img.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
+function renderPhotoRow(box,photos,onAdd,onRem,max){
+  box.innerHTML="";
+  (photos||[]).forEach(function(src,i){var d=document.createElement("div");d.className="photo-thumb";d.innerHTML="<img alt=\"\">";d.querySelector("img").src=src;var b=document.createElement("button");b.type="button";b.textContent="×";b.onclick=function(e){e.stopPropagation();onRem(i)};d.appendChild(b);box.appendChild(d)});
+  if((photos||[]).length<max){var lab=document.createElement("label");lab.className="photo-add";lab.innerHTML="<span>📷</span>Фото";var inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.setAttribute("capture","environment");inp.onchange=function(e){var f=e.target.files&&e.target.files[0];if(!f)return;compressImage(f,720,0.62).then(onAdd).catch(function(){toast("Ошибка фото")});e.target.value=""};lab.appendChild(inp);box.appendChild(lab)}
 }
-
-function renderPhotoRow(container,photos,onAdd,onRemove,max){
-  container.innerHTML="";
-  (photos||[]).forEach(function(src,i){
-    var d=document.createElement("div");d.className="photo-thumb";
-    d.innerHTML='<img src="'+src+'" alt=""><button type="button" aria-label="Удалить">×</button>';
-    d.querySelector("button").onclick=function(e){e.stopPropagation();onRemove(i)};
-    container.appendChild(d);
-  });
-  if((photos||[]).length<max){
-    var add=document.createElement("label");add.className="photo-add";
-    add.innerHTML='<span>📷</span>Фото<input type="file" accept="image/*" capture="environment">';
-    add.querySelector("input").onchange=function(e){
-      var f=e.target.files&&e.target.files[0];if(!f)return;
-      compressImage(f,720,0.62).then(function(data){onAdd(data)}).catch(function(){toast("Ошибка фото")});
-      e.target.value="";
-    };
-    container.appendChild(add);
-  }
-}
-
 function renderList(){
   var list=$("objectsList"),empty=$("emptyState");list.innerHTML="";
   var items=state.objects.slice().sort(function(a,b){return(b.updated||b.created)-(a.updated||a.created)});
@@ -190,174 +137,62 @@ function renderList(){
     var wrap=document.createElement("div");wrap.style.position="relative";
     var btn=document.createElement("button");btn.type="button";btn.className="obj-card";
     var ph=countPhotos(obj);
-    btn.innerHTML="<h3>"+escapeHtml(obj.address||"Без адреса")+"</h3><div class=\"obj-meta\"><span>"+(obj.date||"—")+"</span><span>"+(obj.windows&&obj.windows.length||0)+" поз.</span>"+(ph?"<span>📷 "+ph+"</span>":"")+"<span class=\"obj-area\">"+fmtArea(calcTotal(obj))+"</span></div>";
-    btn.onclick=function(){openObject(obj.id)};
+    var h3=document.createElement("h3");h3.textContent=obj.address||"Без адреса";
+    var meta=document.createElement("div");meta.className="obj-meta";
+    meta.innerHTML="<span>"+esc(obj.date||"—")+"</span><span>"+(obj.windows&&obj.windows.length||0)+" поз.</span>"+(ph?"<span>📷 "+ph+"</span>":"")+"<span class=\"obj-area\">"+fmtArea(calcTotal(obj))+"</span>";
+    btn.appendChild(h3);btn.appendChild(meta);btn.onclick=function(){openObject(obj.id)};
     var del=document.createElement("button");del.type="button";del.className="btn btn-danger obj-del";del.textContent="✕";
     del.onclick=function(e){e.stopPropagation();if(confirm("Удалить замер?")){state.objects=state.objects.filter(function(o){return o.id!==obj.id});saveAll();renderList()}};
     wrap.appendChild(btn);wrap.appendChild(del);list.appendChild(wrap);
   });
 }
-
 function blankWindow(){return{id:uid(),w:"",h:"",qty:"1",note:"",photos:[]}}
-function blankObject(){return{id:uid(),address:"",client:"",phone:"",date:today(),surveyor:localStorage.getItem(SURVEYOR_KEY)||"",film:"",notes:"",photos:[],windows:[blankWindow()],created:Date.now(),updated:Date.now()}}
-
+function blankObject(){return{id:uid(),address:"",client:"",phone:"",date:today(),surveyor:localStorage.getItem(SURV)||"",film:"",notes:"",photos:[],windows:[blankWindow()],created:Date.now(),updated:Date.now()}}
 function openObject(id){state.currentId=id;var obj=state.objects.find(function(o){return o.id===id});if(!obj)return;if(!obj.photos)obj.photos=[];(obj.windows||[]).forEach(function(w){if(!w.photos)w.photos=[]});fillForm(obj);show("form")}
 function newObject(){var obj=blankObject();state.objects.unshift(obj);state.currentId=obj.id;saveAll();fillForm(obj);show("form")}
-
-function fillForm(obj){
-  $("fAddress").value=obj.address||"";$("fClient").value=obj.client||"";$("fPhone").value=obj.phone||"";
-  $("fDate").value=obj.date||today();$("fSurveyor").value=obj.surveyor||"";$("fFilm").value=obj.film||"";$("fNotes").value=obj.notes||"";
-  renderObjPhotos(obj);renderWindows(obj.windows||[]);updateTotal();
-}
-
-function renderObjPhotos(obj){
-  renderPhotoRow($("objPhotos"),obj.photos||[],
-    function(data){obj.photos=obj.photos||[];obj.photos.push(data);saveAll();renderObjPhotos(obj)},
-    function(i){obj.photos.splice(i,1);saveAll();renderObjPhotos(obj)},
-    MAX_PHOTOS_OBJ);
-}
-
-function collectWindows(){
-  var list=[];
-  document.querySelectorAll(".win-card").forEach(function(card){
-    var id=card.dataset.id;
-    var prev=(state.objects.find(function(o){return o.id===state.currentId})||{}).windows||[];
-    var old=prev.find(function(w){return w.id===id})||{};
-    list.push({
-      id:id,
-      w:card.querySelector('[data-f="w"]').value,
-      h:card.querySelector('[data-f="h"]').value,
-      qty:card.querySelector('[data-f="qty"]').value||"1",
-      note:card.querySelector('[data-f="note"]').value.trim(),
-      photos:old.photos||[]
-    });
-  });
-  return list;
-}
-
-function readForm(){
-  var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return null;
-  obj.address=$("fAddress").value.trim();obj.client=$("fClient").value.trim();obj.phone=$("fPhone").value.trim();
-  obj.date=$("fDate").value;obj.surveyor=$("fSurveyor").value.trim();obj.film=$("fFilm").value;obj.notes=$("fNotes").value.trim();
-  obj.windows=collectWindows();obj.updated=Date.now();
-  if(obj.surveyor)localStorage.setItem(SURVEYOR_KEY,obj.surveyor);
-  return obj;
-}
-
-function updateWinArea(card){var a=winAreaM2(card.querySelector('[data-f="w"]').value,card.querySelector('[data-f="h"]').value,card.querySelector('[data-f="qty"]').value);card.querySelector("[data-area]").textContent=fmtArea(a)}
-function updateTotal(){var total=collectWindows().reduce(function(s,w){return s+winAreaM2(w.w,w.h,w.qty)},0);$("totalArea").textContent=fmtArea(total)}
-function renumberWindows(){document.querySelectorAll(".win-card").forEach(function(c,i){c.querySelector(".win-num").textContent="№ "+(i+1)})}
-
-function bindWinCard(card,win){
-  card.querySelector("[data-del]").onclick=function(){card.remove();renumberWindows();updateTotal();readForm();saveAll()};
-  card.querySelectorAll('input[data-f]').forEach(function(inp){
-    inp.addEventListener("input",function(){updateWinArea(card);updateTotal()});
-  });
+function fillForm(obj){$("fAddress").value=obj.address||"";$("fClient").value=obj.client||"";$("fPhone").value=obj.phone||"";$("fDate").value=obj.date||today();$("fSurveyor").value=obj.surveyor||"";$("fFilm").value=obj.film||"";$("fNotes").value=obj.notes||"";renderObjPhotos(obj);renderWindows(obj.windows||[]);updateTotal()}
+function renderObjPhotos(obj){renderPhotoRow($("objPhotos"),obj.photos||[],function(d){obj.photos=obj.photos||[];obj.photos.push(d);saveAll();renderObjPhotos(obj)},function(i){obj.photos.splice(i,1);saveAll();renderObjPhotos(obj)},MAXO)}
+function collectWindows(){var list=[];document.querySelectorAll(".win-card").forEach(function(card){var id=card.dataset.id;var prev=(state.objects.find(function(o){return o.id===state.currentId})||{}).windows||[];var old=prev.find(function(w){return w.id===id})||{};list.push({id:id,w:card.querySelector('[data-f="w"]').value,h:card.querySelector('[data-f="h"]').value,qty:card.querySelector('[data-f="qty"]').value||"1",note:card.querySelector('[data-f="note"]').value.trim(),photos:old.photos||[]})});return list}
+function readForm(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return null;obj.address=$("fAddress").value.trim();obj.client=$("fClient").value.trim();obj.phone=$("fPhone").value.trim();obj.date=$("fDate").value;obj.surveyor=$("fSurveyor").value.trim();obj.film=$("fFilm").value;obj.notes=$("fNotes").value.trim();obj.windows=collectWindows();obj.updated=Date.now();if(obj.surveyor)localStorage.setItem(SURV,obj.surveyor);return obj}
+function updateWinArea(card){card.querySelector("[data-area]").textContent=fmtArea(area(card.querySelector('[data-f="w"]').value,card.querySelector('[data-f="h"]').value,card.querySelector('[data-f="qty"]').value))}
+function updateTotal(){$("totalArea").textContent=fmtArea(collectWindows().reduce(function(s,w){return s+area(w.w,w.h,w.qty)},0))}
+function renumber(){document.querySelectorAll(".win-card").forEach(function(c,i){c.querySelector(".win-num").textContent="№ "+(i+1)})}
+function bindWin(card,win){
+  card.querySelector("[data-del]").onclick=function(){card.remove();renumber();updateTotal();readForm();saveAll()};
+  card.querySelectorAll("input[data-f]").forEach(function(inp){inp.addEventListener("input",function(){updateWinArea(card);updateTotal()})});
   updateWinArea(card);
-  var phBox=card.querySelector("[data-photos]");
-  function refreshPh(){
-    renderPhotoRow(phBox,win.photos||[],
-      function(data){win.photos=win.photos||[];win.photos.push(data);readForm();saveAll();refreshPh()},
-      function(i){win.photos.splice(i,1);readForm();saveAll();refreshPh()},
-      MAX_PHOTOS_WIN);
-  }
-  refreshPh();
+  var box=card.querySelector("[data-photos]");
+  function refresh(){renderPhotoRow(box,win.photos||[],function(d){win.photos=win.photos||[];win.photos.push(d);readForm();saveAll();refresh()},function(i){win.photos.splice(i,1);readForm();saveAll();refresh()},MAXW)}
+  refresh();
 }
-
 function renderWindows(windows){
   var wrap=$("windowsList");wrap.innerHTML="";
   windows.forEach(function(win,i){
     if(!win.photos)win.photos=[];
     var card=document.createElement("div");card.className="win-card";card.dataset.id=win.id;
-    card.innerHTML='<div class="win-card-head"><span class="win-num">№ '+(i+1)+'</span><button type="button" class="btn btn-danger" data-del>Удалить</button></div><div class="win-grid"><label class="field"><span>Ширина, мм</span><input type="number" inputmode="numeric" data-f="w" value="'+(win.w||"")+'" placeholder="1200" min="0"></label><label class="field"><span>Высота, мм</span><input type="number" inputmode="numeric" data-f="h" value="'+(win.h||"")+'" placeholder="1400" min="0"></label><label class="field"><span>Кол-во</span><input type="number" inputmode="numeric" data-f="qty" value="'+(win.qty||1)+'" min="1"></label></div><div class="win-note"><input type="text" data-f="note" value="'+escapeHtml(win.note||"")+'" placeholder="Этаж, помещение"></div><div class="win-area">Площадь: <strong data-area>0,00 м²</strong></div><div class="win-photos"><div class="photos-row" data-photos></div></div>';
-    wrap.appendChild(card);bindWinCard(card,win);
+    card.innerHTML="<div class=\"win-card-head\"><span class=\"win-num\">№ "+(i+1)+"</span><button type=\"button\" class=\"btn btn-danger\" data-del>Удалить</button></div><div class=\"win-grid\"><label class=\"field\"><span>Ширина, мм</span><input type=\"number\" inputmode=\"numeric\" data-f=\"w\" placeholder=\"1200\" min=\"0\"></label><label class=\"field\"><span>Высота, мм</span><input type=\"number\" inputmode=\"numeric\" data-f=\"h\" placeholder=\"1400\" min=\"0\"></label><label class=\"field\"><span>Кол-во</span><input type=\"number\" inputmode=\"numeric\" data-f=\"qty\" min=\"1\"></label></div><div class=\"win-note\"><input type=\"text\" data-f=\"note\" placeholder=\"Этаж, помещение\"></div><div class=\"win-area\">Площадь: <strong data-area>0,00 м²</strong></div><div class=\"win-photos\"><div class=\"photos-row\" data-photos></div></div>";
+    card.querySelector('[data-f="w"]').value=win.w||"";
+    card.querySelector('[data-f="h"]').value=win.h||"";
+    card.querySelector('[data-f="qty"]').value=win.qty||1;
+    card.querySelector('[data-f="note"]').value=win.note||"";
+    wrap.appendChild(card);bindWin(card,win);
   });
 }
-
-function addWindow(){
-  var obj=readForm();if(!obj)return;
-  var win=blankWindow();obj.windows.push(win);saveAll();renderWindows(obj.windows);updateTotal();
-  var cards=document.querySelectorAll(".win-card");if(cards.length)cards[cards.length-1].querySelector('[data-f="w"]').focus();
-}
-
-function saveCurrent(){var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес объекта");$("fAddress").focus();return}saveAll();toast("Сохранено")}
-
-function buildText(obj){
-  var area=calcTotal(obj),ph=countPhotos(obj),t="ПЛЕНКИН — ЗАМЕР ОСТЕКЛЕНИЯ\n────────────────────────\nАдрес: "+obj.address+"\n";
-  if(obj.client)t+="Клиент: "+obj.client+"\n";if(obj.phone)t+="Телефон: "+obj.phone+"\n";
-  t+="Дата: "+(obj.date||"—")+"\n";if(obj.surveyor)t+="Замерщик: "+obj.surveyor+"\n";
-  t+="Плёнка: "+filmLabel(obj.film)+"\n";if(obj.notes)t+="Комментарий: "+obj.notes+"\n";
-  if(ph)t+="Фото: "+ph+" шт.\n";
-  t+="────────────────────────\nПозиции:\n";
-  (obj.windows||[]).forEach(function(w,i){
-    t+=(i+1)+". "+(w.w||"?")+"×"+(w.h||"?")+" мм × "+(w.qty||1)+" шт = "+fmtArea(winAreaM2(w.w,w.h,w.qty));
-    if(w.note)t+=" ("+w.note+")";
-    if(w.photos&&w.photos.length)t+=" [фото: "+w.photos.length+"]";
-    t+="\n";
-  });
-  t+="────────────────────────\nИТОГО: "+fmtArea(area)+"\n\nwww.plenkinaokna.ru · +7 985 780 13 75\n";
-  return t;
-}
-
-function allPhotos(obj){
-  var arr=[];(obj.photos||[]).forEach(function(p){arr.push(p)});
-  (obj.windows||[]).forEach(function(w){(w.photos||[]).forEach(function(p){arr.push(p)})});
-  return arr;
-}
-
-function buildCsv(obj){
-  var rows=[["Адрес","Клиент","Телефон","Дата","Замерщик","Плёнка","№","Ширина мм","Высота мм","Кол-во","Площадь м2","Примечание","Фото шт","Комментарий"]];
-  (obj.windows||[]).forEach(function(w,i){
-    rows.push([obj.address,obj.client,obj.phone,obj.date,obj.surveyor,filmLabel(obj.film),i+1,w.w,w.h,w.qty||1,winAreaM2(w.w,w.h,w.qty).toFixed(3),w.note,(w.photos||[]).length,obj.notes]);
-  });
-  return rows.map(function(r){return r.map(function(c){return '"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(";")}).join("\n");
-}
-
-function openExport(){
-  var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес");return}
-  saveAll();
-  var ph=countPhotos(obj);
-  $("exportSummary").textContent=obj.address+" · "+obj.windows.length+" поз. · "+fmtArea(calcTotal(obj))+(ph?" · 📷 "+ph:"");
-  $("exportPreview").textContent=buildText(obj);
-  var box=$("exportPhotos");box.innerHTML="";
-  allPhotos(obj).forEach(function(src){var img=document.createElement("img");img.src=src;box.appendChild(img)});
-  show("export");
-}
-
+function addWindow(){var obj=readForm();if(!obj)return;var win=blankWindow();obj.windows.push(win);saveAll();renderWindows(obj.windows);updateTotal();var cards=document.querySelectorAll(".win-card");if(cards.length)cards[cards.length-1].querySelector('[data-f="w"]').focus()}
+function saveCurrent(){var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес");$("fAddress").focus();return}saveAll();toast("Сохранено")}
+function buildText(obj){var a=calcTotal(obj),ph=countPhotos(obj),t="ПЛЕНКИН — ЗАМЕР ОСТЕКЛЕНИЯ\n────────────────────────\nАдрес: "+obj.address+"\n";if(obj.client)t+="Клиент: "+obj.client+"\n";if(obj.phone)t+="Телефон: "+obj.phone+"\n";t+="Дата: "+(obj.date||"—")+"\n";if(obj.surveyor)t+="Замерщик: "+obj.surveyor+"\n";t+="Плёнка: "+filmLabel(obj.film)+"\n";if(obj.notes)t+="Комментарий: "+obj.notes+"\n";if(ph)t+="Фото: "+ph+" шт.\n";t+="────────────────────────\nПозиции:\n";(obj.windows||[]).forEach(function(w,i){t+=(i+1)+". "+(w.w||"?")+"×"+(w.h||"?")+" мм × "+(w.qty||1)+" шт = "+fmtArea(area(w.w,w.h,w.qty));if(w.note)t+=" ("+w.note+")";if(w.photos&&w.photos.length)t+=" [фото: "+w.photos.length+"]";t+="\n"});t+="────────────────────────\nИТОГО: "+fmtArea(a)+"\n\nwww.plenkinaokna.ru · +7 985 780 13 75\n";return t}
+function allPhotos(obj){var arr=[];(obj.photos||[]).forEach(function(p){arr.push(p)});(obj.windows||[]).forEach(function(w){(w.photos||[]).forEach(function(p){arr.push(p)})});return arr}
+function buildCsv(obj){var rows=[["Адрес","Клиент","Телефон","Дата","Замерщик","Плёнка","№","Ширина мм","Высота мм","Кол-во","Площадь м2","Примечание","Фото шт","Комментарий"]];(obj.windows||[]).forEach(function(w,i){rows.push([obj.address,obj.client,obj.phone,obj.date,obj.surveyor,filmLabel(obj.film),i+1,w.w,w.h,w.qty||1,area(w.w,w.h,w.qty).toFixed(3),w.note,(w.photos||[]).length,obj.notes])});return rows.map(function(r){return r.map(function(c){return '"'+String(c==null?"":c).replace(/"/g,'""')+'"'}).join(";")}).join("\n")}
+function openExport(){var obj=readForm();if(!obj)return;if(!obj.address){toast("Укажите адрес");return}saveAll();var ph=countPhotos(obj);$("exportSummary").textContent=obj.address+" · "+obj.windows.length+" поз. · "+fmtArea(calcTotal(obj))+(ph?" · 📷 "+ph:"");$("exportPreview").textContent=buildText(obj);var box=$("exportPhotos");box.innerHTML="";allPhotos(obj).forEach(function(src){var img=document.createElement("img");img.src=src;box.appendChild(img)});show("export")}
 function download(name,content,mime){var blob=new Blob(["\ufeff"+content],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-
-async function shareText(obj){
-  var text=buildText(obj);
-  var files=[];
-  try{
-    var photos=allPhotos(obj).slice(0,10);
-    for(var i=0;i<photos.length;i++){
-      var res=await fetch(photos[i]);var blob=await res.blob();
-      files.push(new File([blob],"photo_"+(i+1)+".jpg",{type:"image/jpeg"}));
-    }
-  }catch(e){}
-  if(navigator.share){
-    try{
-      if(files.length&&navigator.canShare&&navigator.canShare({files:files})){
-        await navigator.share({title:"Замер ПЛЕНКИН",text:text,files:files});return;
-      }
-      await navigator.share({title:"Замер ПЛЕНКИН",text:text});return;
-    }catch(e){if(e.name==="AbortError")return}
-  }
-  await navigator.clipboard.writeText(text);toast("Текст скопирован");
-}
-
+function shareText(obj){var text=buildText(obj);if(navigator.share){navigator.share({title:"Замер ПЛЕНКИН",text:text}).catch(function(e){if(e.name!=="AbortError")navigator.clipboard.writeText(text).then(function(){toast("Скопировано")})});return}navigator.clipboard.writeText(text).then(function(){toast("Скопировано")})}
 $("btnNew").onclick=newObject;
 $("btnHome").onclick=function(){readForm();saveAll();renderList();show("list")};
 $("btnAddWin").onclick=addWindow;
 $("btnSave").onclick=saveCurrent;
 $("btnExport").onclick=openExport;
 $("btnBackForm").onclick=function(){show("form")};
-$("btnDeleteObj").onclick=function(){
-  if(!confirm("Удалить этот замер полностью?"))return;
-  state.objects=state.objects.filter(function(o){return o.id!==state.currentId});
-  saveAll();renderList();show("list");toast("Удалено");
-};
+$("btnDeleteObj").onclick=function(){if(!confirm("Удалить этот замер полностью?"))return;state.objects=state.objects.filter(function(o){return o.id!==state.currentId});saveAll();renderList();show("list");toast("Удалено")};
 $("btnCopy").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;navigator.clipboard.writeText(buildText(obj)).then(function(){toast("Скопировано")})};
 $("btnShare").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(obj)shareText(obj)};
 $("btnCsv").onclick=function(){var obj=state.objects.find(function(o){return o.id===state.currentId});if(!obj)return;var name=(obj.address||"zamer").replace(/[\\/:*?\"<>|]/g,"_").slice(0,40);download("zamer_"+name+".csv",buildCsv(obj),"text/csv;charset=utf-8");toast("CSV скачан")};
